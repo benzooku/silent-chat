@@ -1,7 +1,5 @@
 #pragma once
 #include "resources.h"
-#include "p2p_client.hpp"
-
 
 
 namespace networking {
@@ -71,12 +69,12 @@ public:
         return b_in_session;
     }
 public:
-    Session current_session(){
+    session current_session(){
         return sessions[current_session_id];
     }
 
 private:
-    Session sessions[MAX_CONNECTIONS]; // maybe vector or other in future
+    std::array<session, MAX_CONNECTIONS> sessions;
     int current_session_id = 0;
     int session_count = -1;
     bool b_in_session = false;

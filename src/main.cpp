@@ -1,30 +1,50 @@
 #include "resources.h"
 
-#include "p2p_client.hpp"
+#include "connection.hpp"
 #include "session.hpp"
 
-
-bool is_digits(const std::string &str)
+auto is_digits(const std::string &str) -> bool
 {
     return str.find_first_not_of("0123456789") == std::string::npos;
+}
+
+enum arg_flag {
+    help,
+    port,
+    none
+};
+
+arg_flag get_flag(const char* arg){
+    if(strcmp(arg, "--help") == 0 || strcmp(arg, "-h") == 0){
+        return help;
+    } else if(strcmp(arg, "--port") == 0 || strcmp(arg, "-p") == 0){
+        return port;
+    } else {
+        return none;
+    }
+}
+
+bool char_valid_port(const char* port){
+    if(port != nullptr && is_digits(port)) {
+        return true;
+    }
+    return false;
 }
 
 
 int main(int argc, char* argv[])
 {
     boost::asio::io_context io_context;
-    int port = DEFAULT_PORT;
-
     std::thread thrContext;
-
+    u_short port = DEFAULT_PORT;
     for(int i=1; i<argc; i++)
     {
-        if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+        if(get_flag(argv[i]) == help) {
             std::cerr << "Usage: p2p_client <host> /n Flags:\n--port (-p)\tDefines the Port to use (default: 48932)\n--help (-h)\tShows this message" << std::endl;
             return 1;
         }
-        if(strcmp(argv[i], "--port") == 0 || strcmp(argv[i], "-p") == 0) {
-            if(argv[i+1] != NULL && is_digits(argv[i+1])) {
+        if(get_flag(argv[i]) == port) {
+            if(char_valid_port(argv[i+1])) {
                 port = std::stoi(argv[i+1]);
             } else {
                 std::cerr << "Invalid use of port flag" << std::endl;
@@ -36,9 +56,9 @@ int main(int argc, char* argv[])
 
     try
     {
-        P2P_Client p2p_client(io_context, port);
+        networking::connection connection(io_context, port);
 
-        thrContext = std::thread([&]() { io_context.run(); });
+        thrContext = std::thread([&io_context]() { io_context.run(); });
         while(true){
             std::string input;
             std::cin >> input;
@@ -50,7 +70,7 @@ int main(int argc, char* argv[])
                 io_context.stop();
                 break;
             }
-            if(!p2p_client.session_manager.in_session()){
+            if(true){
                 if(input == "send"){
                     std::string receiver;
                     std::string message;
@@ -61,10 +81,10 @@ int main(int argc, char* argv[])
                     Message msg;
                     msg.header.id = MessageType::Text;
                     msg.header.session_type = SessionType::Disabled;
-                    char buffer[1024];
-                    strcpy(buffer, message.c_str());
+                    std::array<char, 1024> buffer = {0};
+                    std::copy(message.begin(), message.end(), buffer.data());
                     msg.add(buffer);
-                    p2p_client.send_message(receiver, DEFAULT_PORT, msg);
+                    connection.send_message(receiver, DEFAULT_PORT, msg);
                 }
                 else if(input == "sendwport"){
                     std::string receiver;
@@ -77,10 +97,10 @@ int main(int argc, char* argv[])
                     Message msg;
                     msg.header.id = MessageType::Text;
                     msg.header.session_type = SessionType::Disabled;
-                    char buffer[1024];
-                    strcpy(buffer, message.c_str());
+                    std::array<char, 1024> buffer = {0};
+                    std::copy(message.begin(), message.end(), buffer.data());
                     msg.add(buffer);
-                    p2p_client.send_message(receiver, std::stoi(port), msg);
+                    connection.send_message(receiver, std::stoi(port), msg);
                 }
                 else if(input == "session"){
                     std::string command;
@@ -95,15 +115,6 @@ int main(int argc, char* argv[])
                 if(input == "session"){
 
                 } else {
-                    Message msg;
-                    msg.header.id = MessageType::Text;
-                    msg.header.session_type = SessionType::Ongoing;
-                    char buffer[1024];
-                    strcpy(buffer, input.c_str());
-                    msg.add(buffer);
-                    p2p_client.send_message(p2p_client.session_manager.current_session().remote_endpoint.address().to_string(),
-                                            p2p_client.session_manager.current_session().remote_endpoint.port(),
-                                            msg);
                 }
 
             }
