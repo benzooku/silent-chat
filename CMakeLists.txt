@@ -13,14 +13,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Boost)
 
-#INCLUDE_DIRECTORIES(${BOOST_LIBRARY_INCLUDES})
-#include_directories(asio INTERFACE ${boost_asio_SOURCE_DIR}/include)
 
 # Add source to this project's executable.
 add_executable (p2p_client "src/main.cpp" "src/resources.h")
 
 
-#target_include_directories(p2p_chat PRIVATE ${BOOST_LIBRARY_INCLUDES})
 
 target_link_libraries(p2p_client
   PRIVATE

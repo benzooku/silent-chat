@@ -11,19 +11,20 @@
 
 #define MAX_CONNECTIONS 20
 #define DEFAULT_PORT 48932
+#define MAX_MESSAGE_SIZE 1024
 
 enum MessageType {
-    Text,
-    LongText,
-    File,
-    Status
+    eText,
+    eLongText,
+    eFile,
+    eStatus
 };
 
 enum SessionType {
-    Request,
-    Accept,
-    Reject,
-    Ongoing,
-    Disabled
+    eRequest,
+    eAccept,
+    eReject,
+    eOngoing,
+    eDisabled
 };
 

@@ -90,5 +90,18 @@
         "ranges": "cpp",
         "stacktrace": "cpp"
     },
-    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json"
+    "C_Cpp.clang_format_fallbackStyle": "Mozilla",
+    "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [
+        "*"
+    ],
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "C_Cpp.clang_format_style": "Mozilla",
+    "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
+        "llvmlibc-implementation-in-namespace",
+        "misc-include-cleaner",
+        "llvmlibc-callee-namespace",
+        "clang-diagnostic-error",
+        "clang-diagnostic-error",
+        "fuchsia-trailing-return"
+    ]
 }
