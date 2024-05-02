@@ -100,8 +100,14 @@
         "llvmlibc-implementation-in-namespace",
         "misc-include-cleaner",
         "llvmlibc-callee-namespace",
-        "clang-diagnostic-error",
-        "clang-diagnostic-error",
         "fuchsia-trailing-return"
-    ]
+    ],
+    "C_Cpp.files.exclude": {
+
+        "**/.vscode": true,
+        "**/.vs": true
+    },
+    "C_Cpp.codeAnalysis.exclude": {
+        "**/build": true
+    }
 }
