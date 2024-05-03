@@ -2,21 +2,9 @@
 #include "message.cpp"
 #include "connection.cpp"
 
-#include "../imgui/imgui.h"
-#include "../imgui/backends/imgui_impl_glfw.h"
-#include "../imgui/backends/imgui_impl_opengl3.h"
-#include <stdio.h>
 
-#define GL_SILENCE_DEPRECATION
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <GLES2/gl2.h>
-#endif
-#include <GLFW/glfw3.h>
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
-#pragma comment(lib, "legacy_stdio_definitions")
-#endif
-
+#include "gui/imgui_resources.hpp"
+#include "gui/chat.cpp"
 
 
 static void glfw_error_callback(int error, const char* description)
@@ -133,14 +121,17 @@ int main(int argc, char* argv[])
     //io.Fonts->AddFontDefault();
     //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+    io.Fonts->AddFontFromFileTTF("../imgui/misc/fonts/Roboto-Medium.ttf", 16.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 
-    bool show_demo_window = true;
+    bool show_demo_window = false;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ChatWindow chatWindow(ioContext, port);
+
+
 
 
     while (!glfwWindowShouldClose(window))
@@ -157,24 +148,8 @@ int main(int argc, char* argv[])
             ImGui::ShowDemoWindow(&show_demo_window);
 
         {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
+            bool open = true;
+            chatWindow.Draw("Chat", &open);
         }
 
         // Rendering
@@ -197,80 +172,8 @@ int main(int argc, char* argv[])
     glfwDestroyWindow(window);
     glfwTerminate();
 
-/*
-    try
-    {
-        networking::Connection connection(ioContext, port);
-
-        thrContext = std::thread([&ioContext]() { ioContext.run(); });
-
-        while(true){
-            std::string input;
-            std::cin >> input;
-
-            if(input == "help"){
-                std::cout << "exit\nsend [receiver] [message]\nsendwport [receiver] [message] [port]\nsession [accept/reject]\n";
-            }
-            else if(input == "exit") {
-                ioContext.stop();
-                break;
-            }
-            if(true){
-                if(input == "send"){
-                    std::string receiver;
-                    std::string message;
-                    std::cin >> receiver;
-                    std::cin >> message;
-
-                    networking::Message msg;
-                    msg.header.id = MessageType::eText;
-                    msg.header.session_type = SessionType::eDisabled;
-                    std::array<char, MAX_MESSAGE_SIZE> buffer = {0};
-                    std::copy(message.begin(), message.end(), buffer.data());
-                    msg.add(buffer);
-                    connection.sendMessage(receiver, DEFAULT_PORT, msg);
-                }
-                else if(input == "sendwport"){
-                    std::string receiver;
-                    std::string message;
-                    std::string port;
-                    std::cin >> receiver;
-                    std::cin >> message;
-                    std::cin >> port;
-
-                    networking::Message msg;
-                    msg.header.id = MessageType::eText;
-                    msg.header.session_type = SessionType::eDisabled;
-                    std::array<char, MAX_MESSAGE_SIZE> buffer = {0};
-                    std::copy(message.begin(), message.end(), buffer.data());
-                    msg.add(buffer);
-                    connection.sendMessage(receiver, std::stoi(port), msg);
-                }
-                else if(input == "session"){
-                    std::string command;
-                    std::cin >> command;
-                    if(command == "accept") {
-                    }
-                    if(command == "reject") {
-
-                    }
-                }
-            } else {
-                if(input == "session"){
-
-                } else {
-                }
-
-            }
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-
-    }
+    ioContext.stop();
     thrContext.join();
-    */
 
 
     return 0;
