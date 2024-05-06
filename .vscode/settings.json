@@ -88,7 +88,10 @@
         "variant": "cpp",
         "filesystem": "cpp",
         "ranges": "cpp",
-        "stacktrace": "cpp"
+        "stacktrace": "cpp",
+        "expected": "cpp",
+        "barrier": "cpp",
+        "latch": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "Mozilla",
     "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [

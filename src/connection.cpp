@@ -4,16 +4,18 @@
 #include "session.cpp"
 #include "handler.cpp"
 
+#include <queue>
+
 namespace networking {
 using boost::asio::ip::udp;
 
 class Connection {
 
 public:
-    Connection(boost::asio::io_context& aIOContext, const u_short akPort)
+    Connection(boost::asio::io_context& aIOContext, const u_short akPort, std::queue<Message>& aQueue)
     : mIOContext(aIOContext),
     mSocketReceive(aIOContext, udp::endpoint(udp::v6(), akPort)), mSocketSend(aIOContext),
-    mResolver(aIOContext){
+    mResolver(aIOContext), mMessageQueue(aQueue){
         mSocketSend.open(udp::v6());
 
         receiveHeader();
@@ -92,6 +94,7 @@ public:
 private:
     void handleReceive(const udp::endpoint &remote_endpoint, const Message &msg)
     {
+        mMessageQueue.push(msg);
         Handler::processIncoming(remote_endpoint, msg);
         receiveHeader();
     }
@@ -107,6 +110,9 @@ private:
     udp::resolver mResolver;
     udp::endpoint mRemoteEndpoint;
     Message mMsgBuffer;
+
+
+    std::queue<Message> &mMessageQueue;
 
 };
 
